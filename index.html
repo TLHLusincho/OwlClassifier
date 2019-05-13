@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Owl Classifier</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+<style>
+ body {
+    background-color: #ffffe6;
+}
+
+.no-display {
+    display: none;
+}
+
+.center {
+    margin: auto;
+    padding: 10px;
+    padding-left:50px;
+    padding-right:50px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.title {
+    font-size: 30px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: #262626;
+}
+
+.content {
+    margin-top: 10em;
+}
+
+.analyze {
+    margin-top: 5em;
+}
+
+.upload-label {
+    padding: 10px;
+    font-size: 12px;
+}
+
+.result-label {
+    margin-top: 0.5em;
+    padding: 10px;
+    font-size: 13px;
+}
+
+button.choose-file-button { 
+  width: 200px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #ffffe6;
+  border: solid 1px #ff9900;
+  font-size: 13px;
+  color: #ff9900;
+}
+
+button.analyze-button {
+    width: 200px;
+    height: 40px;
+    border: solid 1px #ff9900;
+    border-radius: 2px;
+    background-color: #ff9900;
+    font-size: 13px;
+    color: #ffffe6;
+}
+
+button:focus {outline:0;}
+    </style>
+</head>
+<body>
+<div>
+     <div class='center'>
+           <div class='title'>OWL Classifier</div>
+          <div class='content'>
+     <input id='file-input'
+                            class='no-display'
+                            type='file'
+                            name='file'
+                            accept='image/*'
+                            onchange='showPicked(this)'>
+              <div>
+              <button class='choose-file-button' type='button' onclick='showPicker()'>Select Image</label>
+              </div>
+    
+                    <div class='upload-label'>
+                        <label id='upload-label'>No file chosen</label>
+                    </div>
+                    <div>
+                        <img id='image-picked' class='no-display' alt='Chosen Image' height='200'>
+                    </div>
+                    <div class='analyze'>
+                        <button id='analyze-button' class='analyze-button' type='button' onclick='analyze()'>Analyze</button>
+                    </div>
+                    <div class='result-label'>
+                        <h1 id='result-label'></h1>
+                    </div>
+         </div>
+    </div>
+</div>
+<script>
+     
+        function showPicker() { $('#file-input').click(); }
+        function showPicked(input) {
+             $('#upload-label').text(input.files[0].name);
+             var reader = new FileReader();
+             reader.onload = function (e) {
+              $('#image-picked').attr("src", e.target.result);
+              $('#image-picked').removeClass();
+    }  
+             reader.readAsDataURL(input.files[0]);
+}
+       function analyze() {
+           var uploadFiles = $('#file-input').prop('files');
+           if (uploadFiles.length != 1) alert('Please select 1 file to analyze!');
+           
+           $('#analyze-button').text('Analyzing...');
+           var fileData = new FormData();
+            fileData.append('file', uploadFiles[0]);
+           
+           $.ajax({
+                url: '/analyze',
+                type:'POST',               
+                data: fileData, 
+                contentType: false,
+                processData:false,
+                success: function(data){                  
+                       $('#result-label').text(data.result + ' owl')
+                       $('#analyze-button').text('Analyze');                    
+                       
+                },
+                error: function(error){
+                    
+                   alert(error.status + ' ' + error.statusText)
+                }
+               
+           })
+       }         
+    </script>
+</body>
+</html>
